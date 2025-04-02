@@ -1,0 +1,61 @@
+{
+  "name": "vsc-typescript-diagram-generator",
+  "displayName": "Typescript Diagram Generator",
+  "description": "Generate UML diagrams from TypeScript interfaces (draw.io, Mermaid, and PlantUML)",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "drawio-copier.generateDrawioDiagram",
+        "title": "Generate draw.io diagram"
+      },
+      {
+        "command": "drawio-copier.generateMermaidDiagram",
+        "title": "Generate Mermaid diagram"
+      },
+      {
+        "command": "drawio-copier.generatePlantUmlDiagram",
+        "title": "Generate PlantUML diagram"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "drawio-copier.generateDrawioDiagram",
+          "when": "editorTextFocus && editorLangId == typescript"
+        },
+        {
+          "command": "drawio-copier.generateMermaidDiagram",
+          "when": "editorTextFocus && editorLangId == typescript"
+        },
+        {
+          "command": "drawio-copier.generatePlantUmlDiagram",
+          "when": "editorTextFocus && editorLangId == typescript"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "18.x",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  }
+} 
