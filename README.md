@@ -1,6 +1,6 @@
-# Draw.io Interface Generator
+# Typescript Diagram Generator
 
-This VSCode extension allows you to generate a draw.io diagram from a selected TypeScript interface.
+This VSCode extension allows you to generate a diagram (draw.io, Mermaid, and PlantUML) from a selected TypeScript interface.
 
 ## Features
 
@@ -29,7 +29,12 @@ This VSCode extension allows you to generate a draw.io diagram from a selected T
 1. Clone this repository
 2. Run `npm install`
 3. Press F5 to launch the extension in debug mode
-4. Or use `vsce package` to create a .vsix file and install it via VSCode
+4. Or use `vsce package` to create a .vsix file.
+5. Install it via VSCode:
+    * Press Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (Mac) to open the command palette
+    * Type "Install from VSIX" and select it
+    * Navigate to and select your generated .vsix file
+    * VSCode will install the extension
 
 ## Development
 

@@ -1,14 +1,16 @@
 {
   "name": "vsc-typescript-diagram-generator",
   "displayName": "Typescript Diagram Generator",
-  "description": "Generate UML diagrams from TypeScript interfaces (draw.io, Mermaid, and PlantUML)",
+  "description": "Generate UML diagrams from TypeScript interfaces and types (draw.io, Mermaid, and PlantUML)",
   "version": "0.0.1",
+  "repository": {"url": "https://github.com/bat3/vsc-typescript-diagram-generator"},
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Other"
   ],
+  "icon": "images/icon.png",
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -50,12 +52,14 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  },
   "devDependencies": {
     "@types/vscode": "^1.85.0",
     "@types/node": "18.x",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3"
+    "eslint": "^8.56.0"
   }
 } 

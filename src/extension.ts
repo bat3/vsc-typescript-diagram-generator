@@ -37,6 +37,39 @@ function parseInterface(
 	return properties;
 }
 
+function parseType(
+	sourceFile: ts.SourceFile,
+	typeName: string,
+): PropertyInfo[] {
+	const properties: PropertyInfo[] = [];
+
+	function visit(node: ts.Node) {
+		if (ts.isTypeAliasDeclaration(node) && node.name.text === typeName) {
+			const typeNode = node.type;
+			if (ts.isTypeLiteralNode(typeNode)) {
+				for (const member of typeNode.members) {
+					if (ts.isPropertySignature(member)) {
+						const propertyName = member.name.getText(sourceFile);
+						const propertyType = member.type
+							? member.type.getText(sourceFile)
+							: "any";
+						const isOptional = member.questionToken !== undefined;
+
+						properties.push({
+							name: propertyName,
+							type: propertyType,
+							isOptional,
+						});
+					}
+				}
+			}
+		}
+	}
+
+	ts.forEachChild(sourceFile, visit);
+	return properties;
+}
+
 function generateDrawioDiagram(
 	interfaceName: string,
 	properties: PropertyInfo[],
@@ -134,7 +167,9 @@ async function generateDiagram(
 	const selectedText = document.getText(selection);
 
 	if (!selectedText) {
-		vscode.window.showErrorMessage("Please select a TypeScript interface");
+		vscode.window.showErrorMessage(
+			"Please select a TypeScript interface or type",
+		);
 		return;
 	}
 
@@ -146,29 +181,39 @@ async function generateDiagram(
 			throw new Error("Unable to parse the TypeScript file");
 		}
 
-		// Find the selected interface
-		const interfaceName = selectedText.match(/interface\s+(\w+)/)?.[1];
-		if (!interfaceName) {
+		// Find the selected interface or type
+		const interfaceMatch = selectedText.match(/interface\s+(\w+)/);
+		const typeMatch = selectedText.match(/type\s+(\w+)/);
+
+		let name: string | undefined;
+		let properties: PropertyInfo[] | undefined;
+
+		if (interfaceMatch) {
+			name = interfaceMatch[1];
+			properties = parseInterface(sourceFile, name);
+		} else if (typeMatch) {
+			name = typeMatch[1];
+			properties = parseType(sourceFile, name);
+		}
+
+		if (!name || !properties) {
 			vscode.window.showErrorMessage(
-				"Please select a valid TypeScript interface",
+				"Please select a valid TypeScript interface or type",
 			);
 			return;
 		}
-
-		// Parse the interface
-		const properties = parseInterface(sourceFile, interfaceName);
 
 		// Generate diagram
 		let diagram: string;
 		switch (format) {
 			case "drawio":
-				diagram = generateDrawioDiagram(interfaceName, properties);
+				diagram = generateDrawioDiagram(name, properties);
 				break;
 			case "mermaid":
-				diagram = generateMermaidDiagram(interfaceName, properties);
+				diagram = generateMermaidDiagram(name, properties);
 				break;
 			case "plantuml":
-				diagram = generatePlantUmlDiagram(interfaceName, properties);
+				diagram = generatePlantUmlDiagram(name, properties);
 				break;
 		}
 
@@ -183,9 +228,12 @@ async function generateDiagram(
 }
 
 export function activate(context: vscode.ExtensionContext) {
+	console.log("TypeScript Diagram Generator extension is now active!");
+
 	const drawioDisposable = vscode.commands.registerCommand(
 		"drawio-copier.generateDrawioDiagram",
 		async () => {
+			console.log("Generate draw.io diagram command triggered");
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
 				vscode.window.showErrorMessage("No active editor");
@@ -198,6 +246,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const mermaidDisposable = vscode.commands.registerCommand(
 		"drawio-copier.generateMermaidDiagram",
 		async () => {
+			console.log("Generate Mermaid diagram command triggered");
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
 				vscode.window.showErrorMessage("No active editor");
@@ -210,6 +259,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const plantUmlDisposable = vscode.commands.registerCommand(
 		"drawio-copier.generatePlantUmlDiagram",
 		async () => {
+			console.log("Generate PlantUML diagram command triggered");
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
 				vscode.window.showErrorMessage("No active editor");
